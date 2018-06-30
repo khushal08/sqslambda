@@ -1,0 +1,21 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Example of processing messages on an SQS queue with Lambda
+Resources:
+  MySQSQueueFunction:
+    Properties:
+      CodeUri: s3://sqslambda/4a353e98548bbf9bc0d940604547e7e7
+      Events:
+        MySQSEvent:
+          Properties:
+            BatchSize: 10
+            Queue:
+              Fn::GetAtt:
+              - MySqsQueue
+              - Arn
+          Type: SQS
+      Handler: app.lambda_handler
+      Runtime: python3.6
+    Type: AWS::Serverless::Function
+  MySqsQueue:
+    Type: AWS::SQS::Queue
+Transform: AWS::Serverless-2016-10-31
