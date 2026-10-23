@@ -19,7 +19,7 @@ This is a sample template for sam-app - Below is a brief explanation of what we 
 ## Requirements
 
 * AWS CLI already configured with at least PowerUser permission
-* [Python 2.7 installed](https://www.python.org/downloads/)
+* [Python 3.12 installed](https://www.python.org/downloads/)
 * [Docker installed](https://www.docker.com/community-edition)
 * [Python Virtual Environment](http://docs.python-guide.org/en/latest/dev/virtualenvs/)
 
@@ -27,9 +27,12 @@ This is a sample template for sam-app - Below is a brief explanation of what we 
 
 ### Installing dependencies
 
-[AWS Lambda requires a flat folder](https://docs.aws.amazon.com/lambda/latest/dg/lambda-python-how-to-create-deployment-package.html) with the application as well as its dependencies. Therefore, we need to have a 2 step process in order to enable local testing as well as packaging/deployment later on - This consist of two commands you can run as follows:
+The handler has no third-party runtime dependencies. When upgrading, start with a clean `sqs_lambda/build/` directory so previously vendored dependencies are not shipped. Repackage the function before deploying; the artifact referenced in `packaged.yaml` is not updated by source changes.
+
+[AWS Lambda requires a flat folder](https://docs.aws.amazon.com/lambda/latest/dg/lambda-python-how-to-create-deployment-package.html) with the application as well as its dependencies. Create the build directory, then install dependencies and copy the application:
 
 ```bash
+mkdir -p sqs_lambda/build/
 pip install -r requirements.txt -t sqs_lambda/build/
 cp sqs_lambda/*.py sqs_lambda/build/
 ```
@@ -115,14 +118,13 @@ python -m pytest tests/ -v
 # Appendix
 
 ### Python Virtual environment
-**In case you're new to this**, python2 `virtualenv` module is not available in the standard library so we need to install it and then we can install our dependencies:
+Python 3.12 includes the `venv` module for creating an isolated environment:
 
 1. Create a new virtual environment
 2. Install dependencies in the new virtual environment
 
 ```bash
-pip install virtualenv
-virtualenv .venv
+python -m venv .venv
 . .venv/bin/activate
 pip install -r requirements.txt
 ```
